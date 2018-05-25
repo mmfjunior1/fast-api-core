@@ -12,7 +12,7 @@
  */
 namespace FastApi\Db;
 
-use FastApi\Db\Connector;
+use FastApi\Db\DbConnector;
 /**
  * Db Class.
  *
