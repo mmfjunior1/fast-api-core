@@ -33,6 +33,7 @@ class Db extends DbConnector
     private $_sql = '';
     private $_arrayBind = array();
     public $dbResult        = null;
+    protected $fields;
     
     /**
      * Save in database table
@@ -469,6 +470,7 @@ class Db extends DbConnector
         $select                     = $this->select()->where($this->primaryKey, '=', $id)->get();
         $primaryKey                 = $this->primaryKey;
         $this->$primaryKey          = $select->$tableCollection->results[0]->$primaryKey;
+        $this->fields               = (array)$select->$tableCollection->results[0];
         return $select->$tableCollection->results[0];
     }
     /**
