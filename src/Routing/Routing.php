@@ -70,10 +70,8 @@ class Routing
             $indexKey = 0;
             foreach ($key[0] as $index => $value) {
                 if (preg_match_all("/^{[\w\.\-\*\/\+\,\:\;\>\<\s]{1,}}$/", $value)) {
-                    $pos = strpos($uriGetParam[$indexKey],'?');
-                    $pos = $pos > 0 ? $pos : strlen($uriGetParam[$indexKey]);
-                    $key[0][$indexKey]  = substr($uriGetParam[$indexKey],0,$pos );
-                    $paramsToFuncion[]  = $key[0][$indexKey];
+                    $key[0][$indexKey] = $uriGetParam[$indexKey];
+                    $paramsToFuncion[]  = $uriGetParam[$indexKey];
                 }
                 $indexKey++;
             }
@@ -115,6 +113,9 @@ class Routing
                     $explodMethod            = explode("@", $key[1]);
                     $controller              = "App\\Controller\\".$explodMethod[0];
                     $function                = $explodMethod[1];
+                    if (!class_exists($controller)) {
+                        throw new \Exception("Controller {$explodMethod[0]} not exists");
+                    }
                     $controllerInstance      = new $controller;
                     $controllerInstance->parametersRequest     = $getFields;
 

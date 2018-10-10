@@ -29,11 +29,11 @@ class Db extends DbConnector
     
     protected $connection;
     protected $primaryKey;
+    protected $fields;
     protected $table;
     private $_sql = '';
     private $_arrayBind = array();
     public $dbResult        = null;
-    protected $fields;
     
     /**
      * Save in database table
@@ -102,6 +102,33 @@ class Db extends DbConnector
         $this->_sql .= ' '.$substrWhere;
         
         return $this->_updateStatement();
+    }
+
+    /**
+     * Set values to update
+     * 
+     * @param String $field field to set
+     * @param String $clause The clause
+     * @param Mixed $value The value updated
+     * 
+     * @return boolean true
+     */
+    private function setFieldsToUpdate($field = '',$clause = '', $value = '') {
+        $fieldBind = $field;
+        if (strpos($fieldBind, ".")) {
+            $explodefield = explode(".", $fieldBind);
+            $fieldBind = $explodefield[1];
+        }
+        $this->_arrayBind[':'.$fieldBind]    = $value;
+        $strSql = '';
+        if (!stristr($this->_sql, ' SET ')) {
+            $strSql = ' SET '.$field.' '.$clause.' :'.$fieldBind;
+            $this->_sql.= $strSql;
+            return true;
+        }
+        $strSql = ' ,'.$field.' '.$clause.' :'.$field;
+        $this->_sql.= $strSql;
+        return true;
     }
     /**
      * Execute the delete in database table
@@ -270,10 +297,10 @@ class Db extends DbConnector
         $limit         = (int)$limit;
         $offset     = (int)$offset;
         if ($limit > 0) {
-            $this->_arrayBind[':limit'] = $limit;
-            $this->_arrayBind[':offset'] = $offset;
-            $this->_sql.= ' LIMIT :limit';
-            $this->_sql.= ' OFFSET :offset';
+            $this->_sql.= ' LIMIT '.$limit;
+        }
+        if ($offset > 0) {
+            $this->_sql.= ' , '.$offset;
         }
         return $this;
     }
@@ -359,15 +386,15 @@ class Db extends DbConnector
             $fieldBind = $explodefield[1];
         }
         $count             = 1;
-        $strSql = ' OR '.$field.' '.$clause.' :'.$fieldBind.$count;
-        $this->_arrayBind[':'.$fieldBind.$count]    = $value;
+        $strSql = ' OR '.$field.' '.$clause.' :or'.$fieldBind.$count;
+        $this->_arrayBind[':or'.$fieldBind.$count]    = $value;
         if ($clause == 'in') {
             unset($this->_arrayBind[':'.$fieldBind]);
             $valuesToBind     =  explode(",", $value);
             $stringBind     = "";
             foreach ($valuesToBind as $value) {
-                $stringBind.=':'.$fieldBind.$count.',';
-                $this->_arrayBind[':'.$fieldBind.$count] = $value;
+                $stringBind.=':or'.$fieldBind.$count.',';
+                $this->_arrayBind[':or'.$fieldBind.$count] = $value;
                 $count++;
             }
             $stringBind = rtrim($stringBind, ',');
@@ -449,11 +476,9 @@ class Db extends DbConnector
         }
         $resultSet->execute();
         $tableCollection                            = $this->table."Collection";
-        $this->dbResult                            = new \Stdclass;
-        $this->dbResult->$tableCollection          = new \Stdclass;
-        $this->dbResult->$tableCollection->results = $resultSet->fetchAll(\PDO::FETCH_CLASS);
-        $this->dbResult->rows                      = $resultSet->rowCount();
+        @$this->dbResult->$tableCollection->results = $resultSet->fetchAll(\PDO::FETCH_CLASS);
         $resultSet->closeCursor();
+        $this->dbResult->rows                       = count(@$this->dbResult->$tableCollection->results);
         return $this->dbResult;
     }
     /**
