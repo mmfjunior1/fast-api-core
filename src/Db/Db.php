@@ -47,7 +47,7 @@ class Db extends DbConnector
         if ($this->$primaryKey > 0) {
             return $this->_updateStatement($this->$primaryKey);
         }
-        return $this->_insertStatement($this->$primaryKey);
+        return $this->_insertStatement($primaryKey);
     }
     /**
      * Update register in database table
@@ -246,7 +246,7 @@ class Db extends DbConnector
      *
      * @return PDO::execute()
      */
-    private function _insertStatement()
+    private function _insertStatement($primaryKey)
     {
         unset($this->fields[$this->primaryKey]);
 
@@ -262,11 +262,12 @@ class Db extends DbConnector
             }
         }
         $sql .="(".rtrim($columnInsert, ",").") VALUES (".rtrim($columnInsertVal, ',') .')';
-        $result_set = $this->connection->prepare($sql);
+	$result_set = $this->connection->prepare($sql);
         if (!$result_set->execute($_arrayBind)) {
             $error = $result_set->errorInfo();
             throw new \Exception($error[2]);
-        }
+	}
+	$this->$primaryKey = $this->connection->lastInsertId();
     }
     /**
      * Generates the SELECT string
@@ -343,7 +344,7 @@ class Db extends DbConnector
                 $stringBind = rtrim($stringBind, ',');
                 $strSql = ' WHERE '.$field.' '.$clause.' ('.$stringBind.')';
             }
-            $this->_sql.= $strSql;
+	    $this->_sql.= $strSql;
             return $this;
         }
         $strSql = ' AND '.$field.' '.$clause.' :'.$field.$count;
@@ -459,8 +460,7 @@ class Db extends DbConnector
 		{
 			$relationObjectA = $this->primaryKey;
 		} 
-		$this->sql.= " ".$type. ' JOIN '. $tableA. ' ON '.$tableB.'.'.$relationObjectB.' = '.$tableA.'.'.$relationObjectA;
-		
+		$this->_sql.= " ".$type. ' JOIN '. $tableA. ' ON '.$tableB.'.'.$relationObjectB.' = '.$tableA.'.'.$relationObjectA;
 		return $this;
 	}
     /**
@@ -498,6 +498,7 @@ class Db extends DbConnector
         $this->fields               = (array)$select->$tableCollection->results[0];
         return $select->$tableCollection->results[0];
     }
+    
     /**
      * Provides the paginator
      * 

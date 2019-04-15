@@ -40,4 +40,18 @@ class View
         header('Content-Type: application/json');
         return print(json_encode($array));
     }
+
+    public static function render($template = null, $partials = array()) {
+	if ($template === null) {
+	   throw new \Exception("The template must be specified");
+	} 
+	if (count($partials) > 0) {
+	    extract($partials);
+	}
+	if (file_exists('../views/' . $template)) {
+	   require('../views/' . $template);
+	   return true;
+	}
+	throw new \Exception("Template not found");
+    }
 }

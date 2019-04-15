@@ -109,7 +109,10 @@ class Routing
                     }
                 }
                 if ($isValidMethod) {
-                    //
+			//
+		    if(is_callable($key[1])) {
+		    	return $key[1]();
+		    }
                     $explodMethod            = explode("@", $key[1]);
                     $controller              = "App\\Controller\\".$explodMethod[0];
                     $function                = $explodMethod[1];
@@ -143,7 +146,7 @@ class Routing
         case 'GET':
             return filter_input_array(INPUT_GET);
             break;
-        case 'POST':
+	case 'POST':
             return filter_input_array(INPUT_POST);
             break;
         case 'PUT':
