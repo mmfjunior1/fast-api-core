@@ -10,9 +10,9 @@
  * @license  www.aker.com.br Proprietary
  * @link     www.aker.com.br
  */
-namespace Db;
+namespace FastApi\Db;
 
-use Db\DbConnector;
+use FastApi\Db\DbConnector;
 /**
  * Db Class.
  *
