@@ -177,7 +177,7 @@ class Routing
         try {
             return self::_submit();
         } catch (\Exception $e) {
-            return \App\Utils\View\View::json(array("msg"=>'Exception error: '.  $e->getMessage(),"status" => false));
+            return \FastApi\View\ViewView::json(array("msg"=>'Exception error: '.  $e->getMessage(),"status" => false));
         }
     }
 }
