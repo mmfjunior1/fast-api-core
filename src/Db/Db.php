@@ -5,24 +5,24 @@
  * PHP version 5.6
  *
  * @category Db
- * @package  FastApi
- * @author   mmfjunior1@gmail.com <mmfjunior1@gmail.com>
- * @license  mmfjunior1@gmail.com Proprietary
- * @link     
+ * @package  Nstalker
+ * @author   mario.junior@aker.com.br <mario.junior@aker.com.br>
+ * @license  www.aker.com.br Proprietary
+ * @link     www.aker.com.br
  */
-namespace FastApi\Db;
+namespace Db;
 
-use FastApi\Db\DbConnector;
+use Db\DbConnector;
 /**
  * Db Class.
  *
  * PHP version 5.6
  *
  * @category Db
- * @package  FastApi
- * @author   mmfjunior1@gmail.com <mmfjunior1@gmail.com>
- * @license  mmfjunior1@gmail.com Proprietary
- * @link     
+ * @package  Nstalker
+ * @author   mario.junior@aker.com.br <mario.junior@aker.com.br>
+ * @license  www.aker.com.br Proprietary
+ * @link     www.aker.com.br
  */
 class Db extends DbConnector
 {
@@ -47,7 +47,7 @@ class Db extends DbConnector
         if ($this->$primaryKey > 0) {
             return $this->_updateStatement($this->$primaryKey);
         }
-        return $this->_insertStatement($primaryKey);
+        return $this->_insertStatement($this->$primaryKey);
     }
     /**
      * Update register in database table
@@ -246,12 +246,11 @@ class Db extends DbConnector
      *
      * @return PDO::execute()
      */
-    private function _insertStatement($primaryKey)
+    private function _insertStatement()
     {
         unset($this->fields[$this->primaryKey]);
 
         $sql     = "INSERT INTO ".$this->table;
-        $fields    = array_flip($this->fields);
         $columnInsert        = "";
         $columnInsertVal    = "";
         foreach ($this->fields as $field=>$value) {
@@ -262,12 +261,11 @@ class Db extends DbConnector
             }
         }
         $sql .="(".rtrim($columnInsert, ",").") VALUES (".rtrim($columnInsertVal, ',') .')';
-	$result_set = $this->connection->prepare($sql);
+        $result_set = $this->connection->prepare($sql);
         if (!$result_set->execute($_arrayBind)) {
             $error = $result_set->errorInfo();
             throw new \Exception($error[2]);
-	}
-	$this->$primaryKey = $this->connection->lastInsertId();
+        }
     }
     /**
      * Generates the SELECT string
@@ -301,7 +299,7 @@ class Db extends DbConnector
             $this->_sql.= ' LIMIT '.$limit;
         }
         if ($offset > 0) {
-            $this->_sql.= ' , '.$offset;
+            $this->_sql.= ' OFFSET '.$offset;
         }
         return $this;
     }
@@ -344,7 +342,7 @@ class Db extends DbConnector
                 $stringBind = rtrim($stringBind, ',');
                 $strSql = ' WHERE '.$field.' '.$clause.' ('.$stringBind.')';
             }
-	    $this->_sql.= $strSql;
+            $this->_sql.= $strSql;
             return $this;
         }
         $strSql = ' AND '.$field.' '.$clause.' :'.$field.$count;
@@ -460,7 +458,8 @@ class Db extends DbConnector
 		{
 			$relationObjectA = $this->primaryKey;
 		} 
-		$this->_sql.= " ".$type. ' JOIN '. $tableA. ' ON '.$tableB.'.'.$relationObjectB.' = '.$tableA.'.'.$relationObjectA;
+		$this->sql.= " ".$type. ' JOIN '. $tableA. ' ON '.$tableB.'.'.$relationObjectB.' = '.$tableA.'.'.$relationObjectA;
+		
 		return $this;
 	}
     /**
@@ -498,7 +497,7 @@ class Db extends DbConnector
         $this->fields               = (array)$select->$tableCollection->results[0];
         return $select->$tableCollection->results[0];
     }
-    
+
     /**
      * Provides the paginator
      * 

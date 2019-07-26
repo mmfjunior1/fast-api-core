@@ -5,20 +5,20 @@
  * PHP version 5.6
  *
  * @category Bootstrap
- * @package  FastApi
+ * @package  Nstalker
  * @author   Mario Miranda Fernandes Junior <mario.junior@aker.com.br>
- * @license  mmfjunior1@gmail.com Proprietary
- * @link     
+ * @license  www.aker.com.br Proprietary
+ * @link     www.aker.com.br
  */
-namespace FastApi\Routing;
+namespace App\Bootstrap;
 /**
  * Routing Class
  *
  * @category  Bootstrap
- * @package   FastApi
+ * @package   Nstalker
  * @author    Mario Miranda Fernandes Junior <mario.junior@aker.com.br>
- * @copyright 2018 Mario Miranda
- * @license   mmfjunior1@gmail.com Proprietary
+ * @copyright 2015 Aker Security Solutions
+ * @license   www.aker.com.br Proprietary
  * @link      www.aker.com.br
  */
 class Routing
@@ -109,10 +109,10 @@ class Routing
                     }
                 }
                 if ($isValidMethod) {
-			//
-		    if(is_callable($key[1])) {
-		    	return $key[1]();
-		    }
+                    if (is_callable($key[1])) {
+                        return $key[1]();
+                     }
+                    //
                     $explodMethod            = explode("@", $key[1]);
                     $controller              = "App\\Controller\\".$explodMethod[0];
                     $function                = $explodMethod[1];
@@ -146,7 +146,7 @@ class Routing
         case 'GET':
             return filter_input_array(INPUT_GET);
             break;
-	case 'POST':
+        case 'POST':
             return filter_input_array(INPUT_POST);
             break;
         case 'PUT':
@@ -177,7 +177,7 @@ class Routing
         try {
             return self::_submit();
         } catch (\Exception $e) {
-            return \FastApi\View\View::json(array("msg"=>'Exception error: '.  $e->getMessage(),"status" => false));
+            return \App\Utils\View\View::json(array("msg"=>'Exception error: '.  $e->getMessage(),"status" => false));
         }
     }
 }
