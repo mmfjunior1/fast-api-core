@@ -10,7 +10,7 @@
  * @license  www.aker.com.br Proprietary
  * @link     www.aker.com.br
  */
-namespace App\Bootstrap;
+namespace FastApi\Routing;
 /**
  * Routing Class
  *
