@@ -49,6 +49,13 @@ class DbConnector
                     case 'pgsql':
                         $this->connection = new \PDO("pgsql:dbname=".DB_NAME.";host=".DB_HOST.";port=".DB_PORT, DB_USER, DB_PASSWORD,array(\PDO::ATTR_PERSISTENT => true));
                     break;
+                    default:
+                            $this->connection =new \PDO(
+                                "sqlite:$dbPath", "", "", array(
+                                \PDO::ATTR_PERSISTENT => true,
+                            )
+                        );
+                    break;
                 }
                 
             }

@@ -53,6 +53,9 @@ class Logs
         case 3:
             fwrite($arq, $date.' - '.self::$_logType[$type].$requester.$postFields.$message.PHP_EOL."Backtrace: ".print_r(debug_backtrace(), true).PHP_EOL);
             break;
+        default:
+            fwrite($arq, $date.' - '.self::$_logType[$type].$requester.$postFields.$message.PHP_EOL);
+            break;
         }
         fclose($arq);
         if ((int)(filesize($dir.$logFile) / pow(1024, 2)) >= 2) {
