@@ -80,7 +80,8 @@ class Routing
             $uriGetParam = implode("/", $uriGetParam);
             if (preg_match("#^(".preg_quote($key[0],"\\").")+([\/a-zA-Z0-9\-\{\}\%\-\/\*\?\+\.\s\=]){0,}$#", urldecode($uriGetParam))) {
                 foreach ($key[2] as $keyFilter => $filter) {
-                    if ($keyFilter == 'method') {
+                    switch ($keyFilter) {
+                    case 'method':
                         if (is_array($filter)) {
                             if (!in_array($requestMethod, $filter)) {
                                 $isValidMethod    = false;
@@ -91,8 +92,8 @@ class Routing
                             $isValidMethod = false;
                             continue;
                         }
-                    }
-                    if ($keyFilter == 'middleware') {
+                        break;
+                    case 'middleware':
                         if (is_array($filter)) {
                             foreach ($filter as $middleware) {
                                 $middleware         = "App\\Http\\Middleware\\".$middleware;
@@ -104,13 +105,13 @@ class Routing
                         $middleware             = "App\\Http\\Middleware\\".$filter;
                         $middlewareInstance     = new $middleware;
                         $middlewareInstance->run();
+                        break;
                     }
                 }
-                
                 if ($isValidMethod) {
                     if (is_callable($key[1])) {
                         return $key[1]();
-                    }
+                     }
                     //
                     $explodMethod            = explode("@", $key[1]);
                     $controller              = "App\\Controller\\".$explodMethod[0];
@@ -142,20 +143,17 @@ class Routing
     private static function _getParametersRequest($requestMethod = 'GET')
     {
         switch ($requestMethod) {
-            case 'GET':
-                return filter_input_array(INPUT_GET);
-                break;
-            case 'POST':
-                return filter_input_array(INPUT_POST);
-                break;
-            case 'PUT':
-            case 'DELETE':
-            case 'OPTIONS':
-                parse_str(file_get_contents("php://input"), $post_vars);
-                return $post_vars;
-                break;
-            default:
-                return filter_input_array(INPUT_GET);
+        case 'GET':
+            return filter_input_array(INPUT_GET);
+            break;
+        case 'POST':
+            return filter_input_array(INPUT_POST);
+            break;
+        case 'PUT':
+        case 'DELETE':
+        case 'OPTIONS':
+            parse_str(file_get_contents("php://input"), $post_vars);
+            return $post_vars;
             break;
         }
         return false;
